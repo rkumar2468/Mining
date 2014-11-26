@@ -4,12 +4,6 @@ import pprint
 import fileinput 
 from cosineSimilarity import cosineSimilarity
 
-str1 = "hi darling I love you and admire you"
-str2 = "hello darl  miss yoeu"
-# print cosineSimilarity(str1.split(),str2.split())
-
-# exit()
-
 user_array = {}
 prod_array = {}
 avg_rat_array = {}
