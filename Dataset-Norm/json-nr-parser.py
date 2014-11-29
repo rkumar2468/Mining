@@ -16,15 +16,15 @@ users_rec = open("C:\\Users\\raghuar\\Documents\\GitHub\\Mining\\Dataset-Norm\\R
 prods = open("C:\\Users\\raghuar\\Documents\\GitHub\\Mining\\Dataset-Norm\\Rec-NonRec\\products_new.txt","w")
 relation = open("C:\\Users\\raghuar\\Documents\\GitHub\\Mining\\Dataset-Norm\\Rec-NonRec\\relation_new.txt","w")
 relationnrec = open("C:\\Users\\raghuar\\Documents\\GitHub\\Mining\\Dataset-Norm\\Rec-NonRec\\relation_nrec.txt","w")
-# users_nrec.truncate()
-# users_rec.truncate()
-# prods.truncate()
+users_nrec.truncate()
+users_rec.truncate()
+prods.truncate()
 relation.truncate()
 relationnrec.truncate()
 
-# users_nrec.write('USER_ID,USER_NAME\n')
-# users_rec.write('USER_ID,USER_NAME\n')
-# prods.write('PROD_ID,PROD_NAME\n')
+users_nrec.write('USER_ID,USER_NAME\n')
+users_rec.write('USER_ID,USER_NAME\n')
+prods.write('PROD_ID,PROD_NAME\n')
 relation.write("USER_ID,PROD_ID,RATING,AVG_RAT,USEFUL,DUP_CNT\n")
 relationnrec.write("USER_ID,PROD_ID,RATING,AVG_RAT,USEFUL,DUP_CNT\n")
 
@@ -64,7 +64,7 @@ for filenames in files[:]:
 				# urcount = urcount + 1
 				# print w['Name'].encode('utf-8')+'\n\n';
 				usersnrec[hashlib.sha1(str(w['Name'].encode('utf-8'))).hexdigest()] = w['Name'].encode('utf-8');
-				# users_nrec.write(''+hashlib.sha1(str(w['Name'].encode('utf-8'))).hexdigest()+',\''+w['Name'].encode('utf-8')+'\'\n')
+				users_nrec.write(''+hashlib.sha1(str(w['Name'].encode('utf-8'))).hexdigest()+',\''+w['Name'].encode('utf-8')+'\'\n')
 				# relation.write(''+hashlib.sha1(str(w['Name'].encode('utf-8'))).hexdigest()+','+hashlib.sha1(str(name[0])).hexdigest()+','+w['Rating'].encode('utf-8')+','+`avg_rat`+','+`useful`+','+`dup_cnt`+'\n')
 				relationnrec.write(''+hashlib.sha1(str(w['Name'].encode('utf-8'))).hexdigest()+','+hashlib.sha1(str(name[0])).hexdigest()+','+w['Rating'].encode('utf-8')+','+`avg_rat`+','+`useful`+','+`dup_cnt`+'\n')
 			
@@ -75,15 +75,15 @@ for filenames in files[:]:
 			for w in newdata[:]:
 				# unrcount = unrcount + 1
 				usersrec[hashlib.sha1(str(w['Name'].encode('utf-8'))).hexdigest()] = w['Name'].encode('utf-8');
-				# users_rec.write(''+hashlib.sha1(str(w['Name'].encode('utf-8'))).hexdigest()+',\''+w['Name'].encode('utf-8')+'\'\n')
+				users_rec.write(''+hashlib.sha1(str(w['Name'].encode('utf-8'))).hexdigest()+',\''+w['Name'].encode('utf-8')+'\'\n')
 				relation.write(''+hashlib.sha1(str(w['Name'].encode('utf-8'))).hexdigest()+','+hashlib.sha1(str(name[0])).hexdigest()+','+w['Rating'].encode('utf-8')+','+`avg_rat`+','+`useful`+','+`dup_cnt`+'\n')
 
 				
-# for k in usersnrec.keys():
-	# users_nrec.write(""+k+",\'"+usersnrec[k]+"\'\n")
+for k in usersnrec.keys():
+	users_nrec.write(""+k+",\'"+usersnrec[k]+"\'\n")
 
-# for k in usersrec.keys():
-	# users_rec.write(""+k+",\'"+usersrec[k]+"\'\n")
+for k in usersrec.keys():
+	users_rec.write(""+k+",\'"+usersrec[k]+"\'\n")
 
 print "completed the parsing..!"
 file.close()

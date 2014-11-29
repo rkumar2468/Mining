@@ -3,7 +3,7 @@
 % with C = 2 on the entire training data, and outputs the test error. This
 % error should be 0.3077.
 
-%load cvdataset.mat
+load cvdataset.mat
 svmModel = trainSVM(traindata,trainlabels,2);
 predictedLabels = classifySVM(svmModel,testdata);
 testError = sum(abs(predictedLabels-testlabels'))/length(testlabels)
