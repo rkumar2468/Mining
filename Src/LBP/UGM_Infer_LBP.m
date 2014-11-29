@@ -1,42 +1,152 @@
-function [nodeBel, edgeBel] = UGM_Infer_LBP(nodePot,edgePot,edgeStruct)
+function [userBel, productBel, Hi] = UGM_Infer_LBP( adjlist, userPriors, productPriors, edgep, maxIter )
 
-[nNodes,maxState] = size(nodePot);
-nEdges = size(edgePot,3);
-edgeEnds = edgeStruct.edgeEnds;
-V = edgeStruct.V;
-E = edgeStruct.E;
-nStates = edgeStruct.nStates;
+% adjlist : (Ex3) adjacency list; 
+%	First two columns for source (1...N) and dest (1...M), N: #users and M: #prod.s
+%	3rd column either (1) 1 for + and 2 for - , or (2) 1-5: ratings
+% nodep1: NxK1 matrix of initial prior potentials; N: #users, K1: classes/states
+% nodep2: MxK2 matrix of initial prior potentials; M: #prod.s, K2: classes/states
+% edgep: K1xK2x|domain3rdColumn|
+% it: max #iter.s
 
-maximize = 0;
-new_msg = UGM_LoopyBP(nodePot,edgePot,edgeStruct,maximize);
+[N K1] = size(userPriors);
+[M K2] = size(productPriors);
+E = size(adjlist,1);
 
+% initializing all messages to 1
+% holding ALL msgs in log's so init to 0
+m_to = zeros(E,K2);
+m_from = zeros(E,K1);
 
-% Compute nodeBel
-for n = 1:nNodes
-    edges = E(V(n):V(n+1)-1);
-    prod_of_msgs(1:nStates(n),n) = nodePot(n,1:nStates(n))';
-    for e = edges(:)'
-        if n == edgeEnds(e,2)
-            prod_of_msgs(1:nStates(n),n) = prod_of_msgs(1:nStates(n),n) .* new_msg(1:nStates(n),e);
-        else
-            prod_of_msgs(1:nStates(n),n) = prod_of_msgs(1:nStates(n),n) .* new_msg(1:nStates(n),e+nEdges);
-        end
+userPriors = log(userPriors);
+productPriors = log(productPriors);
+edgep = log(edgep);
+
+epsilon = 10^-6;
+
+% for each node 
+repeat = true;
+iter=0;
+
+while( repeat )    
+    tic
+    iter=iter+1
+	maxdiff = -Inf;
+	
+	% compute product buffer for N
+	prodN = zeros(N,K1);
+	for i=1:E
+		prodN(adjlist(i,1),:) = prodN(adjlist(i,1),:) + ( m_from(i,:) );
+	end
+	
+	% compute messages to M nodes
+    alldiff=zeros(2*E,1);
+	for i=1:E
+		a = adjlist(i,1);
+		
+		mn = ( prodN(a,:) - ( m_from(i,:) ) );
+            
+		part = userPriors(a,:) + mn;
+		newmsg = zeros(1,K2);              
+		for k=1:K2
+			term = ( part + edgep( :,k,adjlist(i,3) )' ); 
+			newmsg(k) = log(sum(exp(term-max(term)))) + max(term); 
+		end
+		
+		% normalize: newmsg(i)/sum(newmsg)
+		newmsg = newmsg-( log(sum(exp(newmsg-max(newmsg)))) + max(newmsg) );
+		
+		
+		fark = exp(newmsg) - exp(m_to(i,:));
+		diff = norm(fark);		
+        alldiff(i) = diff;		
+		if( diff > maxdiff)
+			maxdiff = diff;  
+		end 
+
+		m_to(i,:) = newmsg; 
+
+		
+	end % iterating N nodes
+	
+		
+	% compute product buffer for M
+	prodM = zeros(M,K2);
+	for i=1:E
+		prodM(adjlist(i,2),:) = prodM(adjlist(i,2),:) + ( m_to(i,:) );
+	end
+	
+	% compute messages to N nodes
+	for i=1:E
+		a = adjlist(i,2);
+		%b = adjlist(i,1);
+		mn = ( prodM(a,:) - ( m_to(i,:) ) );
+		
+	            
+		part = productPriors(a,:) + mn;
+		newmsg = zeros(1,K1);              
+		for k=1:K1
+			term = ( part + edgep( k,:,adjlist(i,3) ) );  
+			newmsg(k) = log(sum(exp(term-max(term)))) + max(term); 
+		end
+		
+		newmsg = newmsg-( log(sum(exp(newmsg-max(newmsg)))) + max(newmsg) );
+		
+		
+		fark = exp(newmsg) - exp(m_from(i,:));
+		diff = norm(fark);
+        alldiff(i+E) = diff;	
+		
+		if( diff > maxdiff)
+			maxdiff = diff;  
+		end     
+		
+		m_from(i,:) = newmsg; 
+		
+	end % iterating M nodes
+	
+	maxd = max(alldiff) 
+	mind = min(alldiff) 
+	meand = mean(alldiff)
+	p90 = quantile(alldiff, 0.9)
+	
+	if maxdiff < epsilon
+        repeat = false;
     end
-    nodeBel(n,1:nStates(n)) = prod_of_msgs(1:nStates(n),n)'./sum(prod_of_msgs(1:nStates(n),n));
+    
+    if(iter == maxIter)        
+        break;
+    end	
 end
 
-if nargout > 1
-    % Compute edge beliefs
-    edgeBel = zeros(maxState,maxState,nEdges);
-    for e = 1:nEdges
-        n1 = edgeEnds(e,1);
-        n2 = edgeEnds(e,2);
-        belN1 = nodeBel(n1,1:nStates(n1))'./new_msg(1:nStates(n1),e+nEdges);
-        belN2 = nodeBel(n2,1:nStates(n2))'./new_msg(1:nStates(n2),e);
-        b1=repmat(belN1,1,nStates(n2));
-        b2=repmat(belN2',nStates(n1),1);
-        eb = b1.*b2.*edgePot(1:nStates(n1),1:nStates(n2),e);
-        edgeBel(1:nStates(n1),1:nStates(n2),e) = eb./sum(eb(:));
-    end
+% compute beliefs
+userBel = zeros(N,K1);
+productBel = zeros(M,K2);
+% compute product buffer for N
+for i=1:E
+	a = adjlist(i,1);
+	b = adjlist(i,2);
+	userBel(a,:) = userBel(a,:) + ( m_from(i,:) );
+	productBel(b,:) = productBel(b,:) + ( m_to(i,:) );	
 end
+
+for a=1:N
+	userBel(a,:) = (userPriors(a,:)) + ( userBel(a,:) );
+	
+	nwm = userBel(a,:);
+	for k=1:K1
+		userBel(a,k) = 1 / ( sum(exp(nwm-nwm(k))) );
+	end
+	
+end
+for b=1:M
+	productBel(b,:) = (productPriors(b,:)) + ( productBel(b,:) );
+	
+	nwm = productBel(b,:);
+	for k=1:K2
+		productBel(b,k) = 1 / ( sum(exp(nwm-nwm(k))) );
+	end
+	
+end
+
+Hi = exp(m_from(:,K1)); %edge-beliefs for fakeness of users
 end
