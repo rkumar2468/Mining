@@ -1,4 +1,3 @@
-PROD_ID,PROD_NAME
 2bf43893576931c2d4f5a830e5d1d46b74cc25a1,'100 Montaditos'
 a2a20a4becbebc748240c6262665b19390a09a77,'109 Merrick Deli'
 7f43c680af13ce3af3711120cbaaa6d01c3ed2f0,'172 Grocery Corp'
