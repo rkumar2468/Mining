@@ -49,3 +49,11 @@ G = ones(numProducts,1)*0.0001;
 display(Honesty);
 display(Goodness);
 
+%Find top 50 users with minimum honesty probability
+[mx, loc]=mink(Honesty(:),5);
+
+display('Top 50 fake users according to HITS are');
+for i=1:length(loc)
+    display(users{1,2}{loc(i)});    
+end
+
