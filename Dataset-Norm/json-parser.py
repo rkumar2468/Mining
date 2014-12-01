@@ -26,12 +26,12 @@ def percentCheck(count1, count2):
 		return False
 
 print "users.."
-users=open("C:\\Users\\raghuar\\Desktop\\SkillTest\\JSON-Python\\users.txt","w")
-avg_rat=open("C:\\Users\\raghuar\\Documents\\GitHub\\Mining\\Dataset-Norm\\avg_ratings.txt","w")
+users=open("C:\\Users\\raghuar\\Documents\\GitHub\\Mining\\Dataset-Norm\\users.txt","w")
+# avg_rat=open("C:\\Users\\raghuar\\Documents\\GitHub\\Mining\\Dataset-Norm\\avg_ratings.txt","w")
 users.truncate()
-avg_rat.truncate()
+# avg_rat.truncate()
 users.write("USER_ID,USER_NAME\n")
-avg_rat.write("PROD_NAME,AVG_RAT\n")
+# avg_rat.write("PROD_NAME,AVG_RAT\n")
 count=0
 with open('C:\\Users\\raghuar\\Desktop\\SkillTest\\JSON-Python\\yelp_academic_dataset_user.json', 'r') as file:
 	for line in file:
@@ -43,7 +43,7 @@ file.close()
 users.close()
 print "users complete.."
 print "products start.."
-products=open("C:\\Users\\raghuar\\Desktop\\SkillTest\\JSON-Python\\products.txt","w")
+products=open("C:\\Users\\raghuar\\Documents\\GitHub\\Mining\\Dataset-Norm\\products.txt","w")
 products.truncate()
 products.write("PROD_ID,PROD_NAME\n")
 count=0
@@ -53,15 +53,15 @@ with open('C:\\Users\\raghuar\\Desktop\\SkillTest\\JSON-Python\\yelp_academic_da
 		products.write(''+data['business_id'].encode('utf-8')+',\''+data['name'].encode('utf-8')+'\'\n')
 		prod_array[''+data['business_id'].encode('utf-8')] = data['name'].encode('utf-8')
 		avg_rat_array[''+data['business_id'].encode('utf-8')] = `data['stars']`
-		avg_rat.write('\''+data['name'].encode('utf-8')+'\','+`data['stars']`+'\n')
+		# avg_rat.write('\''+data['name'].encode('utf-8')+'\','+`data['stars']`+'\n')
 
 file.close()
-avg_rat.close()
+# avg_rat.close()
 products.close()
 print "products complete..\n"
 
 print "relation start..\n"
-relation=open("C:\\Users\\raghuar\\Desktop\\SkillTest\\JSON-Python\\relation.txt","w")
+relation=open("C:\\Users\\raghuar\\Documents\\GitHub\\Mining\\Dataset-Norm\\relation.txt","w")
 relation.truncate()
 relation.write("USER_ID,PROD_ID,RATING,AVG_RAT,USEFUL,DUP_CNT\n")
 count=0
@@ -85,7 +85,7 @@ for k in rev_text.keys():
 		if k != j:
 			if percentCheck(_count[k],_count[j]) == True:
 				cosine = cosineSimilarity(rev_text[k].split(),rev_text[j].split())
-				if cosine > 0.8:
+				if cosine > 0.7:
 					cosine_sim[str(k).encode('utf-8')] = cosine_sim[str(k).encode('utf-8')] + 1
 for k in cosine_sim.keys():
 	relation.write (""+data_write[k]+","+`cosine_sim[k]`+"\n")
