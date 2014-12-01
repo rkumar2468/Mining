@@ -27,15 +27,17 @@ def percentCheck(count1, count2):
 
 print "users.."
 users=open("C:\\Users\\raghuar\\Desktop\\SkillTest\\JSON-Python\\users.txt","w")
+avg_rat=open("C:\\Users\\raghuar\\Documents\\GitHub\\Mining\\Dataset-Norm\\avg_ratings.txt","w")
 users.truncate()
+avg_rat.truncate()
 users.write("USER_ID,USER_NAME\n")
+avg_rat.write("PROD_NAME,AVG_RAT\n")
 count=0
 with open('C:\\Users\\raghuar\\Desktop\\SkillTest\\JSON-Python\\yelp_academic_dataset_user.json', 'r') as file:
 	for line in file:
 		data = json.loads(line)
 		users.write(''+data['user_id'].encode('utf-8')+',\''+data['name'].encode('utf-8')+'\'\n')
 		user_array[''+data['user_id'].encode('utf-8')] = data['name'].encode('utf-8')
-		# count+=1
 
 file.close()
 users.close()
@@ -49,11 +51,12 @@ with open('C:\\Users\\raghuar\\Desktop\\SkillTest\\JSON-Python\\yelp_academic_da
 	for line in file:
 		data = json.loads(line)
 		products.write(''+data['business_id'].encode('utf-8')+',\''+data['name'].encode('utf-8')+'\'\n')
-		# count+=1
 		prod_array[''+data['business_id'].encode('utf-8')] = data['name'].encode('utf-8')
 		avg_rat_array[''+data['business_id'].encode('utf-8')] = `data['stars']`
+		avg_rat.write('\''+data['name'].encode('utf-8')+'\','+`data['stars']`+'\n')
 
 file.close()
+avg_rat.close()
 products.close()
 print "products complete..\n"
 
@@ -66,9 +69,8 @@ with open('C:\\Users\\raghuar\\Desktop\\SkillTest\\JSON-Python\\yelp_academic_da
 # with open('C:\\Users\\raghuar\\Desktop\\SkillTest\\JSON-Python\\tests.json', 'r') as file:
 	for line in file:
 		data = json.loads(line)
-		# relation.write(''+data['user_id'].encode('utf-8')+','+data['business_id'].encode('utf-8')+','+`data['stars']`+','+avg_rat_array[''+data['business_id'].encode('utf-8')]+','+`data['votes']['useful']`+',0\n')
-		avg_rat_array[''+data['business_id'].encode('utf-8')] = 0
-		data_write[data['review_id'].encode('utf-8')] = ''+data['user_id'].encode('utf-8')+','+data['business_id'].encode('utf-8')+','+`data['stars']`+','+`avg_rat_array[''+data['business_id'].encode('utf-8')]`+','+`data['votes']['useful']`
+		# avg_rat_array[''+data['business_id'].encode('utf-8')] = 0
+		data_write[data['review_id'].encode('utf-8')] = ''+data['user_id'].encode('utf-8')+','+data['business_id'].encode('utf-8')+','+`data['stars']`+','+avg_rat_array[''+data['business_id'].encode('utf-8')]+','+`data['votes']['useful']`
 		rev_text[data['review_id'].encode('utf-8')] = data['text'].encode('utf-8')
 		cosine_sim[data['review_id'].encode('utf-8')]=0
 		_count[data['review_id'].encode('utf-8')] = len(data['text'].encode('utf-8'));
@@ -79,18 +81,14 @@ with open('C:\\Users\\raghuar\\Desktop\\SkillTest\\JSON-Python\\yelp_academic_da
 print "relation complete.."
 count = 0
 for k in rev_text.keys():
-	# print "1."+rev_text[k]+"\n\n"
 	for j in rev_text.keys():
 		if k != j:
 			if percentCheck(_count[k],_count[j]) == True:
-				# count+=1
 				cosine = cosineSimilarity(rev_text[k].split(),rev_text[j].split())
 				if cosine > 0.8:
 					cosine_sim[str(k).encode('utf-8')] = cosine_sim[str(k).encode('utf-8')] + 1
 for k in cosine_sim.keys():
-	# print ("k- "+k+" - "+data_write[k]+","+`cosine_sim[k]`)
 	relation.write (""+data_write[k]+","+`cosine_sim[k]`+"\n")
 
-# print ""+`count`+"\n";
 file.close()
 relation.close()
