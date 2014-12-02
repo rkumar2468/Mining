@@ -1,26 +1,26 @@
 %Step 1 - Read the input file
 
 %Step 1 - Read the input file
-%fid_u = fopen('/home/mudit/workspace/CSE591/Mining/Dataset/Academic/users.txt','r');
+fid_u = fopen('/home/mudit/workspace/CSE591/Mining/Dataset/Academic/users.txt','r');
 %fid_u = fopen('/home/mudit/workspace/CSE591/Mining/Dataset/Training/AlgoRunDataSet/users_rec_1000.txt','r');
 %fid_u = fopen('/home/mudit/workspace/CSE591/Mining/Dataset/Training/AlgoRunDataSet/users_nrec_1000.txt','r');
-fid_u = fopen('/home/mudit/workspace/CSE591/Mining/Dataset/Bot/users.txt','r');
+%fid_u = fopen('/home/mudit/workspace/CSE591/Mining/Dataset/Bot/users.txt','r');
 %fid_u = fopen('D:\workspace\CSE591\Mining\Dataset\Academic\users.txt','r');
 users = textscan(fid_u, '%s %s','delimiter', ';');
 fclose(fid_u);
 
-%fid_p = fopen('/home/mudit/workspace/CSE591/Mining/Dataset/Academic/products.txt','r');
+fid_p = fopen('/home/mudit/workspace/CSE591/Mining/Dataset/Academic/products.txt','r');
 %fid_p = fopen('D:\workspace\CSE591\Mining\Dataset\Academic\products.txt','r');
 %fid_p = fopen('/home/mudit/workspace/CSE591/Mining/Dataset/Training/AlgoRunDataSet/products_rec_1000.txt','r');
-fid_u = fopen('/home/mudit/workspace/CSE591/Mining/Dataset/Bot/products.txt','r');
+%fid_u = fopen('/home/mudit/workspace/CSE591/Mining/Dataset/Bot/products.txt','r');
 %fid_p = fopen('/home/mudit/workspace/CSE591/Mining/Dataset/Training/AlgoRunDataSet/products_nrec_1000.txt','r');
 products = textscan(fid_p, '%s %s','delimiter', ';' );
 fclose(fid_p);
 
-%fid_r = fopen('/home/mudit/workspace/CSE591/Mining/Dataset/Academic/relations.txt','r');
+fid_r = fopen('/home/mudit/workspace/CSE591/Mining/Dataset/Academic/relations_Hits.txt','r');
 %fid_r = fopen('D:\workspace\CSE591\Mining\Dataset\Academic\relations.txt','r');
 %fid_r = fopen('/home/mudit/workspace/CSE591/Mining/Dataset/Training/AlgoRunDataSet/relation_rec_1000.txt','r');
-fid_r = fopen('/home/mudit/workspace/CSE591/Mining/Dataset/Bot/relations_Hits.txt','r');
+%fid_r = fopen('/home/mudit/workspace/CSE591/Mining/Dataset/Bot/relations_Hits.txt','r');
 %fid_r = fopen('/home/mudit/workspace/CSE591/Mining/Dataset/Training/AlgoRunDataSet/relation_nrec_1000.txt','r');
 relation = textscan(fid_r, '%s %s %f %f %d %d','delimiter', ',' );
 fclose(fid_r);
@@ -64,9 +64,9 @@ display(Honesty);
 display(Goodness);
 
 %Find top 25 users with minimum honesty probability
-[mx, loc]=mink(Honesty(:),100);
+[mx, loc]=maxk(Honesty(:),100);
 
-display('Top 25 fake users according to HITS are');
+display('Top 25 honest users according to HITS are');
 for i=1:length(loc)      
     fprintf('%s %s %f\n',users{1,1}{loc(i)},users{1,2}{loc(i)},Honesty(loc(i))); 
 end
