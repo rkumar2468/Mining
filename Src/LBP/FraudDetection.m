@@ -1,17 +1,30 @@
 %This is the main file.
 
 %Step 1 - Read the input file
-fid_u = fopen('/home/mudit/workspace/DataMining/FakeReview/DataSet/Datamining-Dataset-Normalized/users_10.txt','r');
+%fid_u = fopen('/home/mudit/workspace/CSE591/Mining/Dataset/Academic/users.txt','r');
+%fid_u = fopen('/home/mudit/workspace/CSE591/Mining/Dataset/Training/AlgoRunDataSet/users_rec_1000.txt','r');
+%fid_u = fopen('/home/mudit/workspace/CSE591/Mining/Dataset/Training/AlgoRunDataSet/users_nrec_1000.txt','r');
+fid_u = fopen('/home/mudit/workspace/CSE591/Mining/Dataset/Bot/users.txt','r');
+%fid_u = fopen('D:\workspace\CSE591\Mining\Dataset\Academic\users.txt','r');
 users = textscan(fid_u, '%s %s','delimiter', ';');
 fclose(fid_u);
 
-fid_p = fopen('/home/mudit/workspace/DataMining/FakeReview/DataSet/Datamining-Dataset-Normalized/products_10.txt','r');
+%fid_p = fopen('/home/mudit/workspace/CSE591/Mining/Dataset/Academic/products.txt','r');
+%fid_p = fopen('D:\workspace\CSE591\Mining\Dataset\Academic\products.txt','r');
+%fid_p = fopen('/home/mudit/workspace/CSE591/Mining/Dataset/Training/AlgoRunDataSet/products_rec_1000.txt','r');
+fid_u = fopen('/home/mudit/workspace/CSE591/Mining/Dataset/Bot/products.txt','r');
+%fid_p = fopen('/home/mudit/workspace/CSE591/Mining/Dataset/Training/AlgoRunDataSet/products_nrec_1000.txt','r');
 products = textscan(fid_p, '%s %s','delimiter', ';' );
 fclose(fid_p);
 
-fid_r = fopen('/home/mudit/workspace/DataMining/FakeReview/DataSet/Datamining-Dataset-Normalized/relation_10.txt','r');
+%fid_r = fopen('/home/mudit/workspace/CSE591/Mining/Dataset/Academic/relations.txt','r');
+%fid_r = fopen('D:\workspace\CSE591\Mining\Dataset\Academic\relations.txt','r');
+%fid_r = fopen('/home/mudit/workspace/CSE591/Mining/Dataset/Training/AlgoRunDataSet/relation_rec_1000.txt','r');
+fid_r = fopen('/home/mudit/workspace/CSE591/Mining/Dataset/Bot/relations_Hits.txt','r');
+%fid_r = fopen('/home/mudit/workspace/CSE591/Mining/Dataset/Training/AlgoRunDataSet/relation_nrec_1000.txt','r');
 relation = textscan(fid_r, '%s %s %f %f %d %d','delimiter', ',' );
 fclose(fid_r);
+
 
 %Find the number of unique reviewers
 numUsers = length(users{1,1});
@@ -47,32 +60,32 @@ userPriors = ones(numUsers,2)*0.5;
 productPriors = ones(numProducts,2)*0.5;
 
 edgePot = ones(2,2,3);
-edgePot(:,:,1) = [.99 .01; .02 .98];
-edgePot(:,:,2) = [.01 .09; .98 .02];
+edgePot(:,:,1) = [.8 .2; .15 .85];
+edgePot(:,:,2) = [.2 .8; .85 .15];
 
 [userBel, productBel, Hi] = UGM_Infer_LBP(adjList, userPriors, productPriors, edgePot, 1000);
 
 display(userBel);
 display(productBel);
 display(Hi);
-try
-    maxkmex(1,1);
-    maxkmex(1,1);
-catch
-    minmax_install();
-end
+%try
+%    maxkmex(1,1);
+%    maxkmex(1,1);
+%catch
+%    minmax_install();
+%end
 
-%Find top 50 users with maximum probability of being fake
-[mx, loc]=maxk(userBel(:,2),5);
+%Find top 25 users with maximum probability of being fake
+[mx, loc]=maxk(userBel(:,2),100);
 
-display('Top 50 fake users are');
+display('Top 100 fake users are');
 for i=1:length(loc)
-    display(users{1,2}{loc(i)});    
+    fprintf('%s %s %f\n',users{1,1}{loc(i)}, users{1,2}{loc(i)},userBel(loc(i),2));    
 end
 
-%Find top 50 products with maximum probability of being bad
-[mx, loc]=maxk(productBel(:,2),1);
-display('Top 50 bad products are');
+%Find top 15 products with maximum probability of being bad
+[mx, loc]=maxk(productBel(:,2),15);
+display('Top 15 bad products are');
 for i=1:length(loc)
     display(products{1,2}{loc(i)});
 end
