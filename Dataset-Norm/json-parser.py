@@ -75,21 +75,20 @@ with open('C:\\Users\\raghuar\\Desktop\\SkillTest\\JSON-Python\\yelp_academic_da
 		cosine_sim[data['review_id'].encode('utf-8')]=0
 		_count[data['review_id'].encode('utf-8')] = len(data['text'].encode('utf-8'));
 		count+=1
-		# if count == 1000:
-			# break
+		if count == 1000:
+			break
 
 print "relation complete.."
 count = 0
-# for k in rev_text.keys():
-	# for j in rev_text.keys():
-		# if k != j:
-			# if percentCheck(_count[k],_count[j]) == True:
-				# cosine = cosineSimilarity(rev_text[k].split(),rev_text[j].split())
-				# if cosine > 0.7:
-					# cosine_sim[str(k).encode('utf-8')] = cosine_sim[str(k).encode('utf-8')] + 1
+for k in rev_text.keys():
+	for j in rev_text.keys():
+		if k != j:
+			if percentCheck(_count[k],_count[j]) == True:
+				cosine = cosineSimilarity(rev_text[k].split(),rev_text[j].split())
+				if cosine > 0.7:
+					cosine_sim[str(k).encode('utf-8')] = cosine_sim[str(k).encode('utf-8')] + 1
 for k in cosine_sim.keys():
-	# relation.write (""+data_write[k]+","+`cosine_sim[k]`+"\n")
-	relation.write (""+data_write[k]+","+"0\n")
+	relation.write (""+data_write[k]+","+`cosine_sim[k]`+"\n")
 
 file.close()
 relation.close()
